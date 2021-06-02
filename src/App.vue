@@ -36,7 +36,7 @@ export default {
 <style>
 :root {
   /* --primary: #08415e; */
-  --primary: #5ab9ea;
+  --primary: #00ecde;
   --secondary: #c1c8e4;
   --tertiary: #84ceeb;
   --accent: #8860d0;

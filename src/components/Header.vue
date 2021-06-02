@@ -1,28 +1,78 @@
 <template>
-<div class="home">
-  <v-card color="album" elevation="0">
-    <div class="text-center justify-center py-6 header mx-4">
-      <v-icon
-      class="headerFirst"
-      >
-      mdi-account-circle-outline
-      </v-icon>
-
+<div class="header" v-if="getUserName() != null">
+  <div style="position:absolute; left: 50%" class="mt-2">
+    <div style="position: relative; left: -50%;">
       <v-img 
         contain 
         max-width="200px" 
-        class="title"
         src="../assets/logoFC.png"
         @click="$router.push({path:'/'})"
         >
       </v-img>
-
-      <div class="headerLast">
-        <v-icon medium> mdi-account-circle-outline </v-icon>
-        {{ getUserName() }}
-      </div>
     </div>
+  </div>
 
+  <div style="position:absolute; right: 5%" class="mt-5">
+    <v-menu
+      v-model="menu"
+      bottom
+      right
+      offset-y
+      :close-on-content-click="false"
+      close-on-click
+    >
+      <template v-slot:activator="{ on, attrs }">
+        <v-btn
+        fab
+        x-small
+        color="black"
+        outlined
+        v-bind="attrs"
+        v-on="on"
+        >
+          {{ getUserName().substr(0,1) }}
+        </v-btn>
+      </template>
+
+      <v-card>
+        <v-list>
+          <v-list-item>
+            <v-list-item-content>
+              <v-list-item-title>{{ getUserName() }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </v-list>
+
+        <v-divider></v-divider>
+
+        <v-list>
+          <v-list-item>
+            <v-list-item-action>
+              <v-switch
+                inset
+                color="purple"
+              ></v-switch>
+            </v-list-item-action>
+            <v-list-item-title>Setting Test</v-list-item-title>
+          </v-list-item>
+        </v-list>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="menu = false; userLogout()"
+          >
+            Log Out
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-menu>
+  </div>
+
+  <div style="position: absolute; top: 70px; left:50%">
+    <div style="position: relative; left: -50%;">
     <v-tabs
       v-if="currentPageName != 'Home'"
       v-model="tab"
@@ -41,13 +91,14 @@
         <v-icon v-else>{{item.icon}}</v-icon>
       </v-tab>
     </v-tabs>
-  </v-card>
+    </div>
+  </div>
 
 </div>
 </template>
 
 <script>
-import { mapGetters } from 'vuex'
+import { mapGetters, mapActions } from 'vuex'
 
   export default {
     name: 'Header',
@@ -58,6 +109,7 @@ import { mapGetters } from 'vuex'
     data() {
       return {
         tab: null,
+        menu: false,
         items: [
           {text: 'books', icon: 'mdi-book-open-page-variant-outline'},
           {text: 'movies', icon:'mdi-movie-open-outline'},
@@ -73,14 +125,27 @@ import { mapGetters } from 'vuex'
     },
 
     methods: {
+
+      userLogout() {
+        this.logOut();
+        this.$router.push({path:'/'});
+      },
+
       ...mapGetters([
-        'getUserName'
+        'getUserName',
+        'getUserID',
+      ]),
+      ...mapActions([
+        'logOut'
       ])
     }
   }
 </script>
 
 <style>
+.header {
+  height: 130px;
+}
 .album {
   background-color: #FFFF !important;
 }
@@ -88,17 +153,5 @@ import { mapGetters } from 'vuex'
   color: #00ecde !important;
 }
 
-.header {
-  display: flex;
-}
-
-.headerFirst {
-  margin-right: auto;
-  visibility: hidden;
-}
-
-.headerLast {
-  margin-left: auto;
-}
 
 </style>

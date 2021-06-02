@@ -40,6 +40,47 @@ const actions = {
 
     },
 
+    async logOut({commit}) {
+        commit('setUserID', null)
+        commit('setUserName', null)
+    },
+
+    async registerUser({commit}, [username, email]) {
+        
+        console.log(username, email);
+
+        let response;
+
+        try {
+            response = await graphqlClient.mutate({
+                mutation: gql`
+                    mutation ($username: String!, $email: String!){
+                        addUser(
+                        username: $username,
+                        email: $email){
+                            user{
+                                id
+                                username
+                                email
+                                created
+                                admin
+                            }
+                        }
+                    },
+                `,
+                variables: {
+                    username: username,
+                    email: email,
+                }
+            });
+        } catch(e) {
+            return {error: true, content:'Account already exists. Please login.'}
+        }
+
+        commit('setUserID', response.data.addUser.user.id)
+        commit('setUserName', response.data.addUser.user.username)
+    },
+
     async fetchAllUsers({ commit }) {
         const response = await graphqlClient.query({
             query: gql`
