@@ -113,7 +113,7 @@ import { mapGetters, mapActions } from 'vuex'
     },
     data() {
       return {
-        categories: ['Books', 'Movies', 'Tickets'],
+        categories: ['Books', 'Movies', 'Events'],
 
         register: false,
 
@@ -138,6 +138,9 @@ import { mapGetters, mapActions } from 'vuex'
         else if (page == 'Movies') {
           console.log(this.getUserID());
           console.log(this.getAllUsers())
+        }
+        else if (page=='Events') {
+          this.$router.push({path:'/events'});
         }
       },
 

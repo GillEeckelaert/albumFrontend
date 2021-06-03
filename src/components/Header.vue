@@ -113,7 +113,7 @@ import { mapGetters, mapActions } from 'vuex'
         items: [
           {text: 'books', icon: 'mdi-book-open-page-variant-outline'},
           {text: 'movies', icon:'mdi-movie-open-outline'},
-          {text: 'tickets', icon:'mdi-ticket-outline'}
+          {text: 'events', icon:'mdi-ticket-outline'}
         ],
       }
     },

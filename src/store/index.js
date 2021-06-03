@@ -5,6 +5,7 @@ import createPersistedState from 'vuex-persistedstate'
 
 import user from './modules/user'
 import books from './modules/books'
+import events from './modules/events'
 
 Vue.use(Vuex)
 
@@ -18,6 +19,7 @@ export default new Vuex.Store({
   modules: {
     user,
     books,
+    events,
   },
   plugins: [createPersistedState({
     storage: window.sessionStorage,
