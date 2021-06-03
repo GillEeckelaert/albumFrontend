@@ -50,6 +50,8 @@ html {
   text-rendering: optimizeLegibility;
 }
 body {
+  overflow-x: hidden;
   height: 100vh;
+  width: 100%;
 }
 </style>

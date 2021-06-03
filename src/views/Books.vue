@@ -242,6 +242,7 @@
   <v-card 
   class="ma-2 mx-auto bookCard" 
   max-width="500px" 
+  width="90%"
   dark 
   v-for="(book,i) in filteredBooks" 
   :key="i" v-else

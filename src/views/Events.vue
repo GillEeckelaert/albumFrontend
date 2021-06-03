@@ -1,5 +1,5 @@
 <template>
-<div class="books">
+<div class="events">
 
     <div>
         <v-dialog
@@ -145,7 +145,10 @@
                 :disabled="loading.location == 'main'"
                 @click="showAddEvent = true"
                 >
-                VOEG EVENEMENT TOE
+                <span v-if="$vuetify.breakpoint.smAndUp">
+                    VOEG EVENEMENT TOE
+                </span>
+                <v-icon v-else>mdi-plus</v-icon>
                 </v-btn>
             </v-col>
         </v-row>
@@ -228,6 +231,7 @@
     <v-card 
     class="ma-2 mx-auto mb-n4" 
     max-width="500px" 
+    width="90%"
     color="transparent"
     elevation="0"
     >
@@ -241,6 +245,7 @@
     <v-card 
     class="ma-2 mx-auto bookCard" 
     max-width="500px" 
+    width="90%"
     dark 
     >
       <v-card-text>
@@ -274,6 +279,7 @@
     <v-card 
     class="ma-2 mx-auto mb-n4" 
     max-width="500px" 
+    width="90%"
     color="transparent"
     elevation="0"
     >
@@ -286,6 +292,7 @@
   class="ma-2 mx-auto bookCard" 
   max-width="500px" 
   dark 
+  width="90%"
   v-for="(event,i) in filteredEvents" 
   :key="i"
   @click="showExpandedCard == i ? showExpandedCard = null : showExpandedCard = i"
@@ -454,8 +461,8 @@ export default {
 
 <style>
 
-.books {
-
+.events {
+    width: 100%;
 }
 
 .addBook {
