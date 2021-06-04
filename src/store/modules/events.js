@@ -1,6 +1,20 @@
 import graphqlClient from '../../utils/graphql'
 import { gql } from 'graphql-tag'
 
+export const testQuery = gql`
+    query($id: ID!) {
+        user(id: $id) {
+            id
+            events{
+                id
+                title
+                date
+                type
+            }
+        }
+    }
+`;
+
 const actions = {
 
     async fetchUserAllEvents({rootState}) {
@@ -69,6 +83,14 @@ const actions = {
                     title: event.title,
                     type: event.type,
                     date: event.date,
+                },
+                update: (store, {data: { addEvent }}) => {
+                    const data = store.readQuery({
+                        query: testQuery,
+                        variables: { id: rootState.user.userID }
+                    })
+                    data.user.events.push(addEvent.event)
+                    store.writeQuery({query: testQuery, data})
                 }
             });
         } catch(e) {
@@ -96,6 +118,7 @@ const actions = {
                         title: $title,
                         username: $username){
                             event{
+                                id
                                 title
                             }
                         }
@@ -104,6 +127,18 @@ const actions = {
                 variables: {
                     username: rootState.user.userName,
                     title: title,
+                },
+                update: (store, {data: { deleteEvent }}) => {
+                    const data = store.readQuery({
+                        query: testQuery,
+                        variables: { id: rootState.user.userID }
+                    })
+                    console.log(deleteEvent)
+                    console.log(data)
+                    const tempEvent = data.user.events.find(event => event.id === deleteEvent.event.id)
+                    const index = data.user.events.indexOf(tempEvent)
+                    data.user.events.splice(index, 1)
+                    store.writeQuery({query: testQuery, data})
                 }
             });
         } catch(e) {

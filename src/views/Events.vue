@@ -15,7 +15,9 @@
             dark
             >
                 <v-card-title style="background-color:rgba(0,0,0,0.2);" class="white--text">
+                    <v-col cols="10">
                     VOEG EVENEMENT TOE
+                    </v-col>
                     <v-spacer />
                     <v-btn icon dark @click="closeAddEvent()">
                         <v-icon>mdi-close</v-icon>
@@ -30,19 +32,19 @@
                     dense
                     clearable
                     background-color="rgba(255,255,255,0.1)"
-                    class="mt-4"
+                    class="mt-8"
                     />
                 </v-card-text>
 
                 <v-card-text>
-                    <v-text-field 
+                    <v-select 
                     v-model="newEvent.type"
+                    :items="categories"
                     label="Type evenement"
                     outlined
                     dense
-                    clearable
                     background-color="rgba(255,255,255,0.1)"
-                    class="mt-4"
+                    class="mt-n6"
                     />
                 </v-card-text>
 
@@ -67,6 +69,7 @@
                         background-color="rgba(255,255,255,0.1)"
                         v-bind="attrs"
                         v-on="on"
+                        class="mt-n6"
                         ></v-text-field>
                     </template>
                     <v-date-picker
@@ -90,8 +93,140 @@
                 </v-card-text>
 
                 <v-expand-transition>
-                    <div v-if="showMoreOptions" class="mx-2 mt-n8">
-                        MEER OPTIES
+                    <div v-if="showMoreOptions" class="mx-2">
+                        <v-card-text>
+                            <v-menu
+                                ref="timePicker"
+                                v-model="showTimePicker"
+                                :close-on-content-click="false"
+                                :nudge-right="40"
+                                :return-value.sync="newEvent.time"
+                                transition="scale-transition"
+                                offset-y
+                                max-width="290px"
+                                min-width="290px"
+                            >
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-text-field
+                                        v-model="newEvent.time"
+                                        label="Tijd"
+                                        prepend-icon="mdi-clock-time-four-outline"
+                                        readonly
+                                        outlined
+                                        dense
+                                        background-color="rgba(255,255,255,0.1)"
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    ></v-text-field>
+                                </template>
+
+                                <v-time-picker
+                                v-if="showTimePicker"
+                                v-model="newEvent.time"
+                                full-width
+                                @click:minute="$refs.timePicker.save(newEvent.time)"
+                                ></v-time-picker>
+                            </v-menu>
+                        </v-card-text>
+
+                        <v-card-text>
+                            <v-text-field 
+                            v-model="newEvent.country"
+                            label="Land"
+                            outlined
+                            dense
+                            clearable
+                            prepend-icon="mdi-earth"
+                            background-color="rgba(255,255,255,0.1)"
+                            class="mt-n8"
+                            />
+                        </v-card-text>
+
+                        <v-card-text>
+                            <v-text-field 
+                            v-model="newEvent.city"
+                            label="Stad"
+                            outlined
+                            dense
+                            clearable
+                            prepend-icon="mdi-city-variant-outline"
+                            background-color="rgba(255,255,255,0.1)"
+                            class="mt-n8"
+                            />
+                        </v-card-text>
+
+                        <v-card-text>
+                            <v-text-field 
+                            v-model="newEvent.venue"
+                            label="Locatie"
+                            outlined
+                            dense
+                            clearable
+                            prepend-icon="mdi-domain"
+                            background-color="rgba(255,255,255,0.1)"
+                            class="mt-n8"
+                            />
+                        </v-card-text>
+
+                        <v-card-text>
+                            <v-icon>mdi-ticket-outline</v-icon>
+                        </v-card-text>
+                        <v-divider />
+
+                        <div
+                        style="background-color:rgba(255,0,0,0.1)"
+                        >
+                            <v-card-text 
+                            class=""
+                            >
+                                <v-row class="mt-3">
+                                    <v-col cols="auto" class="mt-2">
+                                        1 |
+                                    </v-col>
+                                    <v-col cols="auto" class="mt-2">
+                                        PLAATS
+                                    </v-col>
+                                    <v-col>
+                                        <v-text-field
+                                        v-model="newEvent.seat"
+                                        label="Plaats"
+                                        outlined
+                                        dense
+                                        background-color="rgba(255,255,255,0.1)"
+                                        ></v-text-field>
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
+
+                            <v-card-text 
+                            class="mt-n16"
+                            >
+                                <v-row class="mt-3">
+                                    <v-col cols="auto" class="mt-2 ml-13">
+                                        PRIJS
+                                    </v-col>
+                                    <v-col>
+                                        <v-text-field
+                                        v-model="newEvent.price"
+                                        label="Prijs"
+                                        type="number"
+                                        outlined
+                                        dense
+                                        background-color="rgba(255,255,255,0.1)"
+                                        ></v-text-field>
+                                    </v-col>
+                                    <v-col cols="auto" class="mt-2 ml-n4 mr-1">
+                                        €
+                                    </v-col>
+                                </v-row>
+                            </v-card-text>
+                        </div>
+
+                        <v-divider class="" />
+
+                        <v-card-text>
+                        </v-card-text>
+
                     </div>
                 </v-expand-transition>
 
@@ -125,7 +260,10 @@
                 text
                 @click="showSearch = false; showFilter = !showFilter"
                 >
-                FILTER
+                <span v-if="$vuetify.breakpoint.smAndUp">
+                    FILTER
+                </span>
+                <v-icon v-else>mdi-filter-variant</v-icon>
                 </v-btn>
             </v-col>
 
@@ -134,7 +272,10 @@
                 text
                 @click="showFilter = false; showSearch = !showSearch"
                 >
-                ZOEKEN
+                <span v-if="$vuetify.breakpoint.smAndUp">
+                    ZOEKEN
+                </span>
+                <v-icon v-else>mdi-magnify</v-icon>
                 </v-btn>
             </v-col>
 
@@ -144,7 +285,10 @@
                 :color="view == 'standard' ? 'black' : '#46aef7'"
                 @click="view == 'standard' ? view = 'fancy' : view = 'standard'"
                 >
-                VIEW
+                <span v-if="$vuetify.breakpoint.smAndUp">
+                    VIEW
+                </span>
+                <v-icon v-else>mdi-view-dashboard-outline</v-icon>
                 </v-btn>
             </v-col>
 
@@ -260,7 +404,7 @@
         </v-card>
 
         <v-card 
-        class="ma-2 mx-auto bookCard" 
+        :class="{'bookCardMusical': upcomingEvent.type == 'Musical', 'bookCardConcert': upcomingEvent.type == 'Concert', 'bookCardSport': upcomingEvent.type == 'Sport', 'bookCardEvent': upcomingEvent.type == 'Evenement'}" 
         max-width="500px" 
         width="90%"
         dark 
@@ -340,7 +484,7 @@
             </div>
 
             <v-card 
-            class="ma-2 mx-auto bookCard" 
+            :class="{'bookCardMusical': event.type == 'Musical', 'bookCardConcert': event.type == 'Concert', 'bookCardSport': event.type == 'Sport', 'bookCardEvent': event.type == 'Evenement'}" 
             max-width="500px" 
             dark 
             width="90%"
@@ -358,6 +502,12 @@
                             <v-spacer />
                             <v-col cols="auto" v-if="view == 'fancy'">
                                 <h2 class="white--text">{{ event.date.substr(8,2) }}</h2>
+                            </v-col>
+                            <v-col cols="auto">
+                                <v-icon v-if="event.type == 'Concert'">mdi-microphone-variant</v-icon>
+                                <v-icon v-if="event.type == 'Musical'">mdi-drama-masks</v-icon>
+                                <v-icon v-if="event.type == 'Sport'">mdi-soccer</v-icon>
+                                <v-icon v-if="event.type == 'Evenement'">mdi-calendar</v-icon>
                             </v-col>
                         </v-row>
                     </div>
@@ -425,6 +575,8 @@ export default {
             showFilter: false,
             showExpandedCard: null,
             showDatePicker: false,
+            showTimePicker: false,
+            showTimePicker2: false,
 
             filterRead: false,
 
@@ -432,6 +584,7 @@ export default {
             years: [],
             months: [],
             allMonths: ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'],
+            categories: ['Musical', 'Concert', 'Toneel', 'Festival', 'Evenement', 'Sport'],
 
             events: null,
             upcomingEvent: null,
@@ -452,6 +605,15 @@ export default {
                 title: null,
                 type: null,
                 date: null,
+                time: null,
+                ticketsAmount: null,
+                eticket: null,
+                price: null,
+                confirmation: null,
+                country: null,
+                city: null,
+                venue: null,
+                seats: null,
             }
         }
     },
@@ -611,6 +773,42 @@ export default {
 
 .bookCard {
     background-image: radial-gradient(circle 248px at center, #16d9e3 0%, #30c7ec 47%, #46aef7 100%);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.bookCardMusical {
+    background-image: radial-gradient(circle 248px at center, #16d9e3 0%, #30c7ec 47%, #46aef7 100%);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.bookCardConcert {
+    background-image: radial-gradient(circle 248px at center, #e31616 0%, #ec3030 47%, #f74646 100%);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.bookCardSport {
+    background-image: radial-gradient(circle 248px at center, #8016e3 0%, #b030ec 47%, #a746f7 100%);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.bookCardEvent {
+    background-image: radial-gradient(circle 248px at center, #e39116 0%, #ecba30 47%, #f7ce46 100%);
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 8px;
+    margin-bottom: 8px;
 }
 
 </style>
