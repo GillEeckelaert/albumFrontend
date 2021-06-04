@@ -14,6 +14,7 @@ const actions = {
                         user(id: $id) {
                             id
                             events{
+                                id
                                 title
                                 date
                                 type
@@ -55,7 +56,10 @@ const actions = {
                         type: $type,
                         date: $date){
                             event{
+                                id
                                 title
+                                date
+                                type
                             }
                         }
                     },
@@ -69,6 +73,41 @@ const actions = {
             });
         } catch(e) {
             return {error: true, content:'Event could not be added. Please try again.'}
+        }
+        console.log(response);
+
+        return {error:false, content: null}
+    },
+
+    async deleteEventFromUser({rootState}, title) {
+        
+        console.log(title);
+
+        let response;
+
+        try {
+            response = await graphqlClient.mutate({
+                mutation: gql`
+                    mutation (
+                    $title: String!, 
+                    $username: String!, 
+                    ){
+                        deleteEvent(
+                        title: $title,
+                        username: $username){
+                            event{
+                                title
+                            }
+                        }
+                    },
+                `,
+                variables: {
+                    username: rootState.user.userName,
+                    title: title,
+                }
+            });
+        } catch(e) {
+            return {error: true, content:'Event could not be deleted. Please try again.'}
         }
         console.log(response);
 

@@ -1,6 +1,7 @@
 <template>
 <div class="events">
 
+    <!-- Show AddBook Dialog -->
     <div>
         <v-dialog
         v-model="showAddEvent"
@@ -137,6 +138,16 @@
                 </v-btn>
             </v-col>
 
+            <v-col cols="auto">
+                <v-btn
+                text
+                :color="view == 'standard' ? 'black' : '#46aef7'"
+                @click="view == 'standard' ? view = 'fancy' : view = 'standard'"
+                >
+                VIEW
+                </v-btn>
+            </v-col>
+
             <v-spacer />
 
             <v-col cols="auto">
@@ -154,6 +165,7 @@
         </v-row>
     </div>
 
+    <!-- Show filters -->
     <v-expand-transition>
         <div v-if="showFilter">
             <v-row>
@@ -176,6 +188,7 @@
         </div>
     </v-expand-transition>
 
+    <!-- Show search bar -->
     <v-expand-transition>
         <div v-if="showSearch">
             <v-row>
@@ -195,6 +208,7 @@
         </div>
     </v-expand-transition>
 
+    <!-- Loading of page -->
     <div class="mt-8" v-if="loading.location == 'main'">
         <v-row>
             <v-col class="text-center">
@@ -210,6 +224,7 @@
         </v-row>
     </div>
 
+    <!-- Error of page -->
     <v-card color="red" width="90%" class="mx-auto white--text mt-4" v-else-if="error.location == 'main'">
         <v-card-title>
             <span class="subtitle-2 black--text">
@@ -226,108 +241,171 @@
             </v-btn>
         </v-card-title>
     </v-card>
-<div v-else>
 
-    <v-card 
-    class="ma-2 mx-auto mb-n4" 
-    max-width="500px" 
-    width="90%"
-    color="transparent"
-    elevation="0"
-    >
-      <v-card-title>
-          Volgende evenement:
-          <v-spacer />
-          {{Math.floor((new Date(upcomingEvent.date) - currentDate)/ (1000 * 60 * 60 * 24))}} dagen
-      </v-card-title>
-    </v-card>
+    <!-- Page content -->
+    <div v-else>
 
-    <v-card 
-    class="ma-2 mx-auto bookCard" 
-    max-width="500px" 
-    width="90%"
-    dark 
-    >
-      <v-card-text>
-          <div>
-              <v-row>
-                  <v-col cols="auto" class="white--text">
-                    <h2>{{ upcomingEvent.title }}</h2>
-                  </v-col>
-              </v-row>
-              <v-expand-transition>
-                  <div>
-                    <v-row class="mt-n5">
-                        <v-col cols="auto">
-                            <h4>{{ upcomingEvent.date }}</h4>
+        <v-card 
+        class="ma-2 mx-auto mb-n4" 
+        max-width="500px" 
+        width="90%"
+        color="transparent"
+        elevation="0"
+        >
+            <v-card-title>
+                Volgende evenement:
+                <v-spacer />
+                {{Math.ceil((new Date(upcomingEvent.date) - currentDate)/ (1000 * 60 * 60 * 24))}} dagen
+            </v-card-title>
+        </v-card>
+
+        <v-card 
+        class="ma-2 mx-auto bookCard" 
+        max-width="500px" 
+        width="90%"
+        dark 
+        >
+            <v-card-text>
+                <div>
+                    <v-row>
+                        <v-col cols="auto" class="white--text">
+                            <h2>{{ upcomingEvent.title }}</h2>
                         </v-col>
                     </v-row>
-                    <v-row class="ma-2" v-if="upcomingEvent.type">
-                        <v-chip
-                        label
-                        outlined
-                        >
-                        {{upcomingEvent.type}}
-                        </v-chip>
-                    </v-row>
-                  </div>
-              </v-expand-transition>
-          </div>
-      </v-card-text>
-    </v-card>
+                    <v-expand-transition>
+                        <div>
+                            <v-row class="mt-n5">
+                                <v-col cols="auto">
+                                    <h4>{{ upcomingEvent.date }}</h4>
+                                </v-col>
+                            </v-row>
+                            <v-row class="ma-2" v-if="upcomingEvent.type">
+                                <v-chip
+                                label
+                                outlined
+                                >
+                                {{upcomingEvent.type}}
+                                </v-chip>
+                            </v-row>
+                        </div>
+                    </v-expand-transition>
+                </div>
+            </v-card-text>
+        </v-card>
 
-    <v-card 
-    class="ma-2 mx-auto mb-n4" 
-    max-width="500px" 
-    width="90%"
-    color="transparent"
-    elevation="0"
-    >
-      <v-card-title>
-          Alle evenementen:
-      </v-card-title>
-    </v-card>
+        <v-card 
+        class="ma-2 mx-auto mb-n4" 
+        max-width="500px" 
+        width="90%"
+        color="transparent"
+        elevation="0"
+        >
+            <v-card-title>
+                Alle evenementen:
+            </v-card-title>
+        </v-card>
 
-  <v-card 
-  class="ma-2 mx-auto bookCard" 
-  max-width="500px" 
-  dark 
-  width="90%"
-  v-for="(event,i) in filteredEvents" 
-  :key="i"
-  @click="showExpandedCard == i ? showExpandedCard = null : showExpandedCard = i"
-  >
-      <v-card-text>
-          <div>
-              <v-row>
-                  <v-col cols="auto" class="white--text">
-                    <h2>{{ event.title }}</h2>
-                  </v-col>
-                  <v-col cols="auto" v-if="showExpandedCard != i">
-                    <h4>{{ event.date }}</h4>
-                  </v-col>
-              </v-row>
-              <v-expand-transition>
-                  <div v-if="showExpandedCard == i">
-                    <v-row class="mt-n5">
-                        <v-col cols="auto">
-                            <h4>{{ event.date }}</h4>
-                        </v-col>
+        <div
+        v-for="(event,i) in filteredEvents" 
+        :key="i"
+        >
+            <div v-if="view == 'fancy'">
+                <v-card
+                class="ma-4 mx-auto" 
+                max-width="500px" 
+                dark 
+                v-if="fancyView(event.date.substr(0,4),i)"
+                width="90%"
+                >
+                    <v-row>
+                        <span class="font-weight-bold ml-6">
+                        {{fancyView(event.date.substr(0,4),i)}}
+                        </span>
                     </v-row>
-                    <v-row class="ma-2" v-if="event.type">
-                        <v-chip
-                        label
-                        outlined
-                        >
-                        {{event.type}}
-                        </v-chip>
+                </v-card>
+
+                <v-card
+                class="ma-4 mx-auto" 
+                max-width="500px" 
+                dark 
+                v-if="fancyView(event.date.substr(5,2),i)"
+                width="90%"
+                >
+                    <v-row>
+                        <span class="font-weight-bold ml-6">
+                        {{fancyView(event.date.substr(5,2),i)}}
+                        </span>
                     </v-row>
-                  </div>
-              </v-expand-transition>
-          </div>
-      </v-card-text>
-  </v-card>
-</div>
+                </v-card>
+            </div>
+
+            <v-card 
+            class="ma-2 mx-auto bookCard" 
+            max-width="500px" 
+            dark 
+            width="90%"
+            @click="showExpandedCard == i ? showExpandedCard = null : showExpandedCard = i"
+            >
+                <v-card-text>
+                    <div>
+                        <v-row>
+                            <v-col cols="auto" class="white--text">
+                                <h2>{{ event.title }}</h2>
+                            </v-col>
+                            <v-col cols="auto" v-if="view == 'standard' && showExpandedCard != i">
+                                <h4>{{ event.date }}</h4>
+                            </v-col>
+                            <v-spacer />
+                            <v-col cols="auto" v-if="view == 'fancy'">
+                                <h2 class="white--text">{{ event.date.substr(8,2) }}</h2>
+                            </v-col>
+                        </v-row>
+                    </div>
+                </v-card-text>
+
+                <v-expand-transition>
+                    <div v-if="showExpandedCard == i">
+                        <v-card-text class="mt-n8">
+                            <div>
+                                <v-row class="mt-n3">
+                                    <v-col cols="auto">
+                                        <h4>{{ event.date }}</h4>
+                                    </v-col>
+                                </v-row>
+                                <v-row class="ma-2" v-if="event.type">
+                                    <v-chip
+                                    label
+                                    outlined
+                                    >
+                                    {{event.type}}
+                                    </v-chip>
+                                </v-row>
+                            </div>
+                        </v-card-text>
+
+                        <v-card-actions class="mt-n6">
+                            <v-spacer />
+                            <v-btn 
+                            text 
+                            color="white"
+                            :disabled="loading.location == 'removeEvent'"
+                            >
+                                Update
+                            </v-btn>
+                            <v-btn 
+                            text 
+                            color="red" 
+                            :loading="loading.location == 'removeEvent'"
+                            @click="removeEvent(event)"
+                            >
+                                Delete
+                            </v-btn>
+                        </v-card-actions>
+                    </div>
+                </v-expand-transition>
+            </v-card>
+        </div>
+    </div>
 </div>
 </template>
 
@@ -349,6 +427,11 @@ export default {
             showDatePicker: false,
 
             filterRead: false,
+
+            view: 'standard',
+            years: [],
+            months: [],
+            allMonths: ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'],
 
             events: null,
             upcomingEvent: null,
@@ -399,7 +482,40 @@ export default {
             console.log(this.authors)
         }, */
 
+        fancyView(arg, i) {
+            if(arg.length == 4) {
+                for(var j in this.years) {
+                    if (this.years[j].year == arg) {
+                        if (this.years[j].key == i) {
+                            return arg
+                        }
+                        else {
+                            return null
+                        }
+                    }
+                }
+                this.years.push({year:arg, key:i})
+            }
+            else {
+                for(var k in this.months) {
+                    if (this.months[k].month == arg) {
+                        if (this.months[k].key == i) {
+                            const index = parseInt(arg)
+                            return this.allMonths[index-1]
+                        }
+                        else {
+                            return null
+                        }
+                    }
+                }
+                this.months.push({month:arg, key:i})
+            }
+            return arg;
+        }, 
+
         async findCorrectEvents() {
+            this.years = []
+            this.months = []
             const response = await this.fetchUserAllEvents();
             if (response.error) {
                 this.error.content = response.content;
@@ -438,8 +554,31 @@ export default {
             }
             const response = await this.addEventToUser(this.newEvent);
             console.log(response);
+            await this.findCorrectEvents()
             this.closeAddEvent();
         }, 
+
+        async removeEvent(event) {
+            this.loading.location = 'removeEvent'
+            this.error.location = null;
+            if (event.title == null) {
+                this.error.content = 'Evenement kan niet verwijderd worden. Probeer later opnieuw.'
+                this.error.location = 'removeEvent'
+                this.loading.location = null
+                return;
+            }
+            const response = await this.deleteEventFromUser(event.title);
+            if (response.error) {
+                this.error.content = 'Evenement kan niet verwijderd worden. Probeer later opnieuw.'
+                this.error.location = 'removeEvent'
+                this.loading.location = null
+                return;
+            }
+
+            console.log(response);
+            await this.findCorrectEvents();
+            this.loading.location = null
+        },
 
         closeAddEvent() {
             this.showAddEvent = false;
@@ -452,6 +591,7 @@ export default {
             'fetchAllUsers',
             'fetchUserAllEvents',
             'addEventToUser',
+            'deleteEventFromUser'
         ]),
         ...mapGetters(['getAllUsers'])
 
