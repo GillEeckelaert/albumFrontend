@@ -10,6 +10,13 @@ export const testQuery = gql`
                 title
                 date
                 type
+                seats
+                time
+                venue
+                city
+                country
+                price
+                ticketsAmount
             }
         }
     }
@@ -23,19 +30,7 @@ const actions = {
 
         try {
             response = await graphqlClient.query({
-                query: gql`
-                    query($id: ID!) {
-                        user(id: $id) {
-                            id
-                            events{
-                                id
-                                title
-                                date
-                                type
-                            }
-                        }
-                    }
-                `,
+                query: testQuery,
                 variables: {
                     id: rootState.user.userID,
                 }
@@ -63,11 +58,25 @@ const actions = {
                     $users: String!, 
                     $type: String!, 
                     $date: Date!, 
+                    $time: Time,
+                    $country: String,
+                    $city: String,
+                    $venue: String,
+                    $seats: String,
+                    $price: Float,
+                    $ticketsAmount: Int,
                     ){
                         addEvent(
                         title: $title,
                         users: $users,
                         type: $type,
+                        time: $time,
+                        country: $country,
+                        city: $city,
+                        venue: $venue,
+                        seats: $seats,
+                        price: $price,
+                        ticketsAmount: $ticketsAmount,
                         date: $date){
                             event{
                                 id
@@ -83,6 +92,13 @@ const actions = {
                     title: event.title,
                     type: event.type,
                     date: event.date,
+                    time: event.time,
+                    country: event.country,
+                    city: event.city,
+                    venue: event.venue,
+                    seats: event.seats,
+                    price: event.price,
+                    ticketsAmount: event.ticketsAmount,
                 },
                 update: (store, {data: { addEvent }}) => {
                     const data = store.readQuery({

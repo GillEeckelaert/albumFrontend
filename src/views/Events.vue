@@ -9,6 +9,7 @@
         max-width="500px"
         overlay-opacity="0.8"
         overlay-color="white"
+        persistent
         >
             <v-card
             class="bookCard"
@@ -177,52 +178,54 @@
                         style="background-color:rgba(255,0,0,0.1)"
                         >
                             <v-card-text 
+                            v-for="index in newEvent.ticketsAmount"
+                            :key="index"
                             class=""
                             >
-                                <v-row class="mt-3">
+                                <v-row class="mt-3 mb-n16">
                                     <v-col cols="auto" class="mt-2">
-                                        1 |
-                                    </v-col>
-                                    <v-col cols="auto" class="mt-2">
-                                        PLAATS
+                                        {{index}} |
                                     </v-col>
                                     <v-col>
                                         <v-text-field
-                                        v-model="newEvent.seat"
+                                        v-model="newEvent.seats[index]"
                                         label="Plaats"
                                         outlined
                                         dense
+                                        prepend-icon="mdi-seat"
                                         background-color="rgba(255,255,255,0.1)"
                                         ></v-text-field>
                                     </v-col>
                                 </v-row>
                             </v-card-text>
-
-                            <v-card-text 
-                            class="mt-n16"
-                            >
-                                <v-row class="mt-3">
-                                    <v-col cols="auto" class="mt-2 ml-13">
-                                        PRIJS
-                                    </v-col>
-                                    <v-col>
-                                        <v-text-field
-                                        v-model="newEvent.price"
-                                        label="Prijs"
-                                        type="number"
-                                        outlined
-                                        dense
-                                        background-color="rgba(255,255,255,0.1)"
-                                        ></v-text-field>
-                                    </v-col>
-                                    <v-col cols="auto" class="mt-2 ml-n4 mr-1">
-                                        €
-                                    </v-col>
+                            <v-card-text class="mt-6">
+                                <v-row>
+                                    <v-spacer />
+                                    <v-btn v-if="newEvent.ticketsAmount > 1" icon class="mr-4 mb-4" @click="newEvent.ticketsAmount -= 1">
+                                        <v-icon>mdi-minus</v-icon>
+                                    </v-btn>
+                                    <v-btn icon class="mr-4 mb-4" @click="newEvent.ticketsAmount += 1">
+                                        <v-icon>mdi-plus</v-icon>
+                                    </v-btn>
                                 </v-row>
                             </v-card-text>
                         </div>
 
                         <v-divider class="" />
+
+                        <v-card-text>
+                            <v-text-field 
+                            v-model="newEvent.price"
+                            label="Prijs"
+                            outlined
+                            dense
+                            clearable
+                            type="number"
+                            prepend-icon="mdi-currency-eur"
+                            background-color="rgba(255,255,255,0.1)"
+                            class="mt-4"
+                            />
+                        </v-card-text>
 
                         <v-card-text>
                         </v-card-text>
@@ -282,8 +285,7 @@
             <v-col cols="auto">
                 <v-btn
                 text
-                :color="view == 'standard' ? 'black' : '#46aef7'"
-                @click="view == 'standard' ? view = 'fancy' : view = 'standard'"
+                @click="showView = !showView"
                 >
                 <span v-if="$vuetify.breakpoint.smAndUp">
                     VIEW
@@ -325,6 +327,42 @@
                     @click="filterRead = !filterRead"
                     >
                         ONGELEZEN
+                    </v-btn>
+                </v-col>
+                <v-spacer />
+            </v-row>
+        </div>
+    </v-expand-transition>
+
+    <!-- Show views -->
+    <v-expand-transition>
+        <div v-if="showView">
+            <v-row>
+                <v-spacer />
+                <v-col cols="auto">
+                    <v-btn
+                    small
+                    rounded
+                    color="#46aef7"
+                    :outlined="view != 'fancy'"
+                    dark
+                    depressed
+                    @click="view == 'standard' ? view = 'fancy' : view = 'standard'"
+                    >
+                        FANCY
+                    </v-btn>
+                </v-col>
+                <v-col cols="auto">
+                    <v-btn
+                    small
+                    rounded
+                    color="#46aef7"
+                    :outlined="!viewPast"
+                    dark
+                    depressed
+                    @click="viewPast = !viewPast"
+                    >
+                        VOORBIJE EVENEMENTEN
                     </v-btn>
                 </v-col>
                 <v-spacer />
@@ -388,172 +426,367 @@
 
     <!-- Page content -->
     <div v-else>
-
-        <v-card 
-        class="ma-2 mx-auto mb-n4" 
-        max-width="500px" 
-        width="90%"
-        color="transparent"
-        elevation="0"
-        >
-            <v-card-title>
-                Volgende evenement:
-                <v-spacer />
-                {{Math.ceil((new Date(upcomingEvent.date) - currentDate)/ (1000 * 60 * 60 * 24))}} dagen
-            </v-card-title>
-        </v-card>
-
-        <v-card 
-        :class="{'bookCardMusical': upcomingEvent.type == 'Musical', 'bookCardConcert': upcomingEvent.type == 'Concert', 'bookCardSport': upcomingEvent.type == 'Sport', 'bookCardEvent': upcomingEvent.type == 'Evenement'}" 
-        max-width="500px" 
-        width="90%"
-        dark 
-        >
-            <v-card-text>
-                <div>
-                    <v-row>
-                        <v-col cols="auto" class="white--text">
-                            <h2>{{ upcomingEvent.title }}</h2>
-                        </v-col>
-                    </v-row>
-                    <v-expand-transition>
-                        <div>
-                            <v-row class="mt-n5">
-                                <v-col cols="auto">
-                                    <h4>{{ upcomingEvent.date }}</h4>
-                                </v-col>
-                            </v-row>
-                            <v-row class="ma-2" v-if="upcomingEvent.type">
-                                <v-chip
-                                label
-                                outlined
-                                >
-                                {{upcomingEvent.type}}
-                                </v-chip>
-                            </v-row>
-                        </div>
-                    </v-expand-transition>
-                </div>
-            </v-card-text>
-        </v-card>
-
-        <v-card 
-        class="ma-2 mx-auto mb-n4" 
-        max-width="500px" 
-        width="90%"
-        color="transparent"
-        elevation="0"
-        >
-            <v-card-title>
-                Alle evenementen:
-            </v-card-title>
-        </v-card>
-
-        <div
-        v-for="(event,i) in filteredEvents" 
-        :key="i"
-        >
-            <div v-if="view == 'fancy'">
-                <v-card
-                class="ma-4 mx-auto" 
-                max-width="500px" 
-                dark 
-                v-if="fancyView(event.date.substr(0,4),i)"
-                width="90%"
-                >
-                    <v-row>
-                        <span class="font-weight-bold ml-6">
-                        {{fancyView(event.date.substr(0,4),i)}}
-                        </span>
-                    </v-row>
-                </v-card>
-
-                <v-card
-                class="ma-4 mx-auto" 
-                max-width="500px" 
-                dark 
-                v-if="fancyView(event.date.substr(5,2),i)"
-                width="90%"
-                >
-                    <v-row>
-                        <span class="font-weight-bold ml-6">
-                        {{fancyView(event.date.substr(5,2),i)}}
-                        </span>
-                    </v-row>
-                </v-card>
-            </div>
+        <div v-if="events.length > 0">
+            <v-card 
+            class="ma-2 mx-auto mb-n4" 
+            max-width="500px" 
+            width="90%"
+            color="transparent"
+            elevation="0"
+            >
+                <v-card-title>
+                    Volgende evenement:
+                    <v-spacer />
+                    {{Math.ceil((new Date(upcomingEvent.date) - currentDate)/ (1000 * 60 * 60 * 24))}} dagen
+                </v-card-title>
+            </v-card>
 
             <v-card 
-            :class="{'bookCardMusical': event.type == 'Musical', 'bookCardConcert': event.type == 'Concert', 'bookCardSport': event.type == 'Sport', 'bookCardEvent': event.type == 'Evenement'}" 
+            v-bind:class="['eventCard', 'eventCard'+upcomingEvent.type]"
             max-width="500px" 
-            dark 
             width="90%"
-            @click="showExpandedCard == i ? showExpandedCard = null : showExpandedCard = i"
+            dark 
             >
                 <v-card-text>
                     <div>
                         <v-row>
                             <v-col cols="auto" class="white--text">
-                                <h2>{{ event.title }}</h2>
-                            </v-col>
-                            <v-col cols="auto" v-if="view == 'standard' && showExpandedCard != i">
-                                <h4>{{ event.date }}</h4>
+                                <h2>{{ upcomingEvent.title }}</h2>
                             </v-col>
                             <v-spacer />
-                            <v-col cols="auto" v-if="view == 'fancy'">
-                                <h2 class="white--text">{{ event.date.substr(8,2) }}</h2>
-                            </v-col>
                             <v-col cols="auto">
-                                <v-icon v-if="event.type == 'Concert'">mdi-microphone-variant</v-icon>
-                                <v-icon v-if="event.type == 'Musical'">mdi-drama-masks</v-icon>
-                                <v-icon v-if="event.type == 'Sport'">mdi-soccer</v-icon>
-                                <v-icon v-if="event.type == 'Evenement'">mdi-calendar</v-icon>
+                                <v-chip
+                                label
+                                color="white"
+                                class="mt-1"
+                                >
+                                <span v-bind:class="['eventCard'+upcomingEvent.type]">{{upcomingEvent.type}}</span>
+                                </v-chip>
+                            </v-col>
+                        </v-row>
+                        <v-row class="mt-n10">
+                            <v-col cols="auto">
+                                <h4>{{ upcomingEvent.date }}</h4>
                             </v-col>
                         </v-row>
                     </div>
                 </v-card-text>
+            </v-card>
 
-                <v-expand-transition>
-                    <div v-if="showExpandedCard == i">
-                        <v-card-text class="mt-n8">
+            <v-card 
+            class="ma-2 mx-auto mb-n4" 
+            max-width="500px" 
+            width="90%"
+            color="transparent"
+            elevation="0"
+            >
+                <v-card-title>
+                    Komende evenementen:
+                </v-card-title>
+            </v-card>
+
+            <div
+            v-for="(event,i) in filteredEvents" 
+            :key="i"
+            >
+                <div v-if="view == 'fancy'">
+                    <v-card
+                    class="ma-4 mx-auto" 
+                    max-width="500px" 
+                    dark 
+                    v-if="fancyView(event.date.substr(0,4),i)"
+                    width="90%"
+                    >
+                        <v-row>
+                            <span class="font-weight-bold ml-6">
+                            {{fancyView(event.date.substr(0,4),i)}}
+                            </span>
+                        </v-row>
+                    </v-card>
+
+                    <v-card
+                    class="ma-4 mx-auto" 
+                    max-width="500px" 
+                    dark 
+                    v-if="fancyView(event.date.substr(5,2),i)"
+                    width="90%"
+                    >
+                        <v-row>
+                            <span class="font-weight-bold ml-6">
+                            {{fancyView(event.date.substr(5,2),i)}}
+                            </span>
+                        </v-row>
+                    </v-card>
+                </div>
+
+                <v-card 
+                v-bind:class="['eventCard', 'eventCard'+event.type]"
+                max-width="500px" 
+                dark 
+                width="90%"
+                @click="showExpandedCard == i ? showExpandedCard = null : showExpandedCard = i"
+                >
+                    <v-card-text>
+                        <div>
+                            <v-row>
+                                <v-col cols="auto" class="white--text">
+                                    <h2>{{ event.title }}</h2>
+                                </v-col>
+                                <v-col cols="auto" v-if="view == 'standard'">
+                                    <h4>{{ event.date }}</h4>
+                                </v-col>
+                                <v-spacer />
+                                <v-col cols="auto" v-if="view == 'fancy'">
+                                    <h2 class="white--text">{{ event.date.substr(8,2) }}</h2>
+                                </v-col>
+                                <v-col cols="auto">
+                                    <v-icon v-if="event.type == 'Concert'">mdi-microphone-variant</v-icon>
+                                    <v-icon v-if="event.type == 'Musical'">mdi-drama-masks</v-icon>
+                                    <v-icon v-if="event.type == 'Sport'">mdi-soccer</v-icon>
+                                    <v-icon v-if="event.type == 'Evenement'">mdi-calendar</v-icon>
+                                    <v-icon v-if="event.type == 'Pretpark'">mdi-ferris-wheel</v-icon>
+                                </v-col>
+                            </v-row>
+                        </div>
+                    </v-card-text>
+
+                    <v-expand-transition>
+                        <div v-if="showExpandedCard == i">
+                            <v-card-text class="mt-n8">
+                                <div>
+                                    <v-row class="mt-n3">
+                                        <v-col cols="auto" v-if="event.city || event.venue">
+                                            <h4 v-if="event.city && event.venue">{{event.venue}}, {{event.city}}</h4>
+                                            <h4 v-else-if="event.city">{{event.city}}</h4>
+                                            <h4 v-else-if="event.venue">{{event.venue}}</h4>
+                                        </v-col>
+                                    </v-row>
+                                    <v-row class="mt-n7" v-if="event.time">
+                                        <v-col cols="auto grey--text text--lighten-3">
+                                            <h5>{{event.time.substr(0,5)}}</h5>
+                                        </v-col>
+                                    </v-row>
+                                    <div v-if="event.seats != null" class="mt-4 text-center">
+                                        <v-row 
+                                        v-for="(ticket, l) in event.seats.split('|')"
+                                        class="mt-n4"
+                                        :key="l"
+                                        >
+                                            <v-col>
+                                                <v-chip
+                                                label 
+                                                outlined
+                                                color="white"
+                                                class=""
+                                                >
+                                                <v-icon class="mr-2">mdi-seat</v-icon>
+                                                {{ticket}}
+                                                </v-chip>
+                                            </v-col>
+                                        </v-row>
+                                    </div>
+                                    <v-row class="mt-n3 mb-n11">
+                                        <v-col cols="auto">
+                                            <v-chip
+                                            label
+                                            color="white"
+                                            class="mt-2"
+                                            >
+                                            <span v-bind:class="'eventCard'+event.type">{{event.type}}</span>
+                                            </v-chip>
+                                        </v-col>
+                                    </v-row>
+                                </div>
+                            </v-card-text>
+
+                            <v-card-actions class="mt-n6">
+                                <v-spacer />
+                                <v-btn 
+                                text 
+                                color="white"
+                                :disabled="loading.location == 'removeEvent'"
+                                >
+                                    Update
+                                </v-btn>
+                                <v-btn 
+                                text 
+                                color="white" 
+                                :loading="loading.location == 'removeEvent'"
+                                @click="removeEvent(event)"
+                                >
+                                    Delete
+                                </v-btn>
+                            </v-card-actions>
+                        </div>
+                    </v-expand-transition>
+                </v-card>
+            </div>
+
+            <div v-if="viewPast">
+                <v-card 
+                class="ma-2 mx-auto mb-n4" 
+                max-width="500px" 
+                width="90%"
+                color="transparent"
+                elevation="0"
+                >
+                    <v-card-title>
+                        Voorbije evenementen:
+                    </v-card-title>
+                </v-card>
+
+                <div
+                v-for="(event,i) in passedEvents" 
+                :key="'p'+i"
+                >
+                    <div v-if="view == 'fancy'">
+                        <v-card
+                        class="ma-4 mx-auto" 
+                        max-width="500px" 
+                        dark 
+                        v-if="fancyView(event.date.substr(0,4),i)"
+                        width="90%"
+                        >
+                            <v-row>
+                                <span class="font-weight-bold ml-6">
+                                {{fancyView(event.date.substr(0,4),i)}}
+                                </span>
+                            </v-row>
+                        </v-card>
+
+                        <v-card
+                        class="ma-4 mx-auto" 
+                        max-width="500px" 
+                        dark 
+                        v-if="fancyView(event.date.substr(5,2),i)"
+                        width="90%"
+                        >
+                            <v-row>
+                                <span class="font-weight-bold ml-6">
+                                {{fancyView(event.date.substr(5,2),i)}}
+                                </span>
+                            </v-row>
+                        </v-card>
+                    </div>
+
+                    <v-card 
+                    v-bind:class="['eventCard', 'eventCard'+event.type]"
+                    max-width="500px" 
+                    dark 
+                    width="90%"
+                    @click="showExpandedCard == 'p'+i ? showExpandedCard = null : showExpandedCard = 'p'+i"
+                    >
+                        <v-card-text>
                             <div>
-                                <v-row class="mt-n3">
-                                    <v-col cols="auto">
+                                <v-row>
+                                    <v-col cols="auto" class="white--text">
+                                        <h2>{{ event.title }}</h2>
+                                    </v-col>
+                                    <v-col cols="auto" v-if="view == 'standard'">
                                         <h4>{{ event.date }}</h4>
                                     </v-col>
-                                </v-row>
-                                <v-row class="ma-2" v-if="event.type">
-                                    <v-chip
-                                    label
-                                    outlined
-                                    >
-                                    {{event.type}}
-                                    </v-chip>
+                                    <v-spacer />
+                                    <v-col cols="auto" v-if="view == 'fancy'">
+                                        <h2 class="white--text">{{ event.date.substr(8,2) }}</h2>
+                                    </v-col>
+                                    <v-col cols="auto">
+                                        <v-icon v-if="event.type == 'Concert'">mdi-microphone-variant</v-icon>
+                                        <v-icon v-if="event.type == 'Musical'">mdi-drama-masks</v-icon>
+                                        <v-icon v-if="event.type == 'Sport'">mdi-soccer</v-icon>
+                                        <v-icon v-if="event.type == 'Evenement'">mdi-calendar</v-icon>
+                                        <v-icon v-if="event.type == 'Pretpark'">mdi-ferris-wheel</v-icon>
+                                    </v-col>
                                 </v-row>
                             </div>
                         </v-card-text>
 
-                        <v-card-actions class="mt-n6">
-                            <v-spacer />
-                            <v-btn 
-                            text 
-                            color="white"
-                            :disabled="loading.location == 'removeEvent'"
-                            >
-                                Update
-                            </v-btn>
-                            <v-btn 
-                            text 
-                            color="red" 
-                            :loading="loading.location == 'removeEvent'"
-                            @click="removeEvent(event)"
-                            >
-                                Delete
-                            </v-btn>
-                        </v-card-actions>
-                    </div>
-                </v-expand-transition>
-            </v-card>
+                        <v-expand-transition>
+                            <div v-if="showExpandedCard == 'p'+i">
+                                <v-card-text class="mt-n8">
+                                    <div>
+                                        <v-row class="mt-n3">
+                                            <v-col cols="auto" v-if="event.city || event.venue">
+                                                <h4 v-if="event.city && event.venue">{{event.venue}}, {{event.city}}</h4>
+                                                <h4 v-else-if="event.city">{{event.city}}</h4>
+                                                <h4 v-else-if="event.venue">{{event.venue}}</h4>
+                                            </v-col>
+                                        </v-row>
+                                        <v-row class="mt-n7" v-if="event.time">
+                                            <v-col cols="auto grey--text text--lighten-3">
+                                                <h5>{{event.time.substr(0,5)}}</h5>
+                                            </v-col>
+                                        </v-row>
+                                        <div v-if="event.seats != null" class="mt-4 text-center">
+                                            <v-row 
+                                            v-for="(ticket, l) in event.seats.split('|')"
+                                            class="mt-n4"
+                                            :key="l"
+                                            >
+                                                <v-col>
+                                                    <v-chip
+                                                    label 
+                                                    outlined
+                                                    color="white"
+                                                    class=""
+                                                    >
+                                                    <v-icon class="mr-2">mdi-seat</v-icon>
+                                                    {{ticket}}
+                                                    </v-chip>
+                                                </v-col>
+                                            </v-row>
+                                        </div>
+                                        <v-row class="mt-n3 mb-n11">
+                                            <v-col cols="auto">
+                                                <v-chip
+                                                label
+                                                color="white"
+                                                class="mt-2"
+                                                >
+                                                <span v-bind:class="'eventCard'+event.type">{{event.type}}</span>
+                                                </v-chip>
+                                            </v-col>
+                                        </v-row>
+                                    </div>
+                                </v-card-text>
+
+                                <v-card-actions class="mt-n6">
+                                    <v-spacer />
+                                    <v-btn 
+                                    text 
+                                    color="white"
+                                    :disabled="loading.location == 'removeEvent'"
+                                    >
+                                        Update
+                                    </v-btn>
+                                    <v-btn 
+                                    text 
+                                    color="white" 
+                                    :loading="loading.location == 'removeEvent'"
+                                    @click="removeEvent(event)"
+                                    >
+                                        Delete
+                                    </v-btn>
+                                </v-card-actions>
+                            </div>
+                        </v-expand-transition>
+                    </v-card>
+                </div>
+            </div>
+        </div>
+
+        <div v-else>
+            <v-row>
+                <v-col class="text-center mt-8">
+                    <v-icon size="75">
+                        mdi-calendar-remove
+                    </v-icon>
+                </v-col>
+            </v-row>
+            <v-row>
+                <v-col class="text-center mt-n4">
+                    Je hebt nog geen evenementen toegevoegd.
+                </v-col>
+            </v-row>
         </div>
     </div>
 </div>
@@ -573,6 +806,7 @@ export default {
             showMoreOptions: false,
             showSearch: false,
             showFilter: false,
+            showView: false,
             showExpandedCard: null,
             showDatePicker: false,
             showTimePicker: false,
@@ -581,12 +815,14 @@ export default {
             filterRead: false,
 
             view: 'standard',
+            viewPast: false,
             years: [],
             months: [],
             allMonths: ['Januari', 'Februari', 'Maart', 'April', 'Mei', 'Juni', 'Juli', 'Augustus', 'September', 'Oktober', 'November', 'December'],
-            categories: ['Musical', 'Concert', 'Toneel', 'Festival', 'Evenement', 'Sport'],
+            categories: ['Musical', 'Concert', 'Toneel', 'Festival', 'Evenement', 'Sport', 'Pretpark'],
 
             events: null,
+            passedEvents: null,
             upcomingEvent: null,
             search: '',
 
@@ -606,14 +842,14 @@ export default {
                 type: null,
                 date: null,
                 time: null,
-                ticketsAmount: null,
+                ticketsAmount: 1,
                 eticket: null,
                 price: null,
                 confirmation: null,
                 country: null,
                 city: null,
                 venue: null,
-                seats: null,
+                seats: [],
             }
         }
     },
@@ -638,11 +874,6 @@ export default {
         },
     },
     methods: {
-        /* async findAuthorsUser() {
-            const response = await this.fetchUserAllAuthors();
-            this.authors = response.content;
-            console.log(this.authors)
-        }, */
 
         fancyView(arg, i) {
             if(arg.length == 4) {
@@ -676,6 +907,7 @@ export default {
         }, 
 
         async findCorrectEvents() {
+            console.log('HIER')
             this.years = []
             this.months = []
             const response = await this.fetchUserAllEvents();
@@ -686,38 +918,68 @@ export default {
                 return;
             }
 
-            this.events = response.content;
-            console.log(this.events);
+            var app = this;
+
+            this.events = response.content.filter(function(event) {
+                return new Date(event.date) >= app.currentDate;
+            });
+
+            this.passedEvents = response.content.filter(function(event) {
+                return new Date(event.date) < app.currentDate;
+            });
 
             this.events.sort(function(a,b) {
                 return new Date(a.date) - new Date(b.date)
             })
 
-            var app = this;
-
-            this.upcomingEvent = this.events.find(function(event) {
-                return new Date (event.date) >= app.currentDate
+            this.passedEvents.sort(function(a,b) {
+                return new Date(b.date) - new Date(a.date)
             })
 
-            console.log(this.upcomingEvent)
+            if (this.events.length > 0){
+                this.upcomingEvent = this.events.find(function(event) {
+                    return new Date (event.date) >= app.currentDate
+                })
+
+
+                console.log(this.upcomingEvent)
+            }
 
             console.log(this.events)
 
             this.loading.location = null;
+            console.log('DAAR')
             return;
         },
 
         async appendEvent() {
             this.error.location = null;
+            if (this.newEvent.seats == null || this.newEvent.seats.length == 0) {
+                this.newEvent.seats = null;
+            } 
+            else {
+                let seats = ''
+                for (var i = 1; i < this.newEvent.seats.length; i++) {
+                    console.log(this.newEvent.seats[i])
+                    if(seats == '') {
+                        seats += this.newEvent.seats[i]
+                    } else {
+                        seats += '|'+this.newEvent.seats[i]
+                    }
+                }
+                this.newEvent.seats = seats;
+            }
+
             if (this.newEvent.title == null) {
                 this.error.content = 'Je moet verplicht een titel opgeven.'
                 this.error.location = 'addEvent'
+                this.newEvent.seats = []
                 return;
             }
             const response = await this.addEventToUser(this.newEvent);
             console.log(response);
             await this.findCorrectEvents()
-            this.closeAddEvent();
+            this.closeAddEvent(); 
         }, 
 
         async removeEvent(event) {
@@ -747,6 +1009,13 @@ export default {
             this.newEvent.title = null;
             this.newEvent.type = null;
             this.newEvent.date = null;
+            this.newEvent.time = null;
+            this.newEvent.country = null;
+            this.newEvent.city = null;
+            this.newEvent.venue = null;
+            this.newEvent.seats = [];
+            this.newEvent.ticketsAmount = 1;
+            this.newEvent.price = null;
         }, 
 
         ...mapActions([
@@ -779,36 +1048,47 @@ export default {
     margin-bottom: 8px;
 }
 
-.bookCardMusical {
+.eventCard{
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 8px;
+    margin-bottom: 8px;
+}
+
+.eventCardMusical {
     background-image: radial-gradient(circle 248px at center, #16d9e3 0%, #30c7ec 47%, #46aef7 100%);
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 8px;
-    margin-bottom: 8px;
 }
 
-.bookCardConcert {
+span.eventCardMusical {
+    background: transparent;
+    color: rgb(0, 153, 255);
+}
+
+.eventCardConcert {
     background-image: radial-gradient(circle 248px at center, #e31616 0%, #ec3030 47%, #f74646 100%);
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 8px;
-    margin-bottom: 8px;
 }
 
-.bookCardSport {
+span.eventCardConcert {
+    background: transparent;
+    color: rgb(255, 0, 0);
+}
+
+.eventCardSport {
     background-image: radial-gradient(circle 248px at center, #8016e3 0%, #b030ec 47%, #a746f7 100%);
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 8px;
-    margin-bottom: 8px;
 }
 
-.bookCardEvent {
+span.eventCardSport {
+    background: transparent;
+    color: rgb(183, 0, 255);
+}
+
+.eventCardPretpark {
     background-image: radial-gradient(circle 248px at center, #e39116 0%, #ecba30 47%, #f7ce46 100%);
-    margin-left: auto;
-    margin-right: auto;
-    margin-top: 8px;
-    margin-bottom: 8px;
+}
+
+span.eventCardPretpark {
+    background: transparent;
+    color: rgb(255, 166, 0);
 }
 
 </style>
